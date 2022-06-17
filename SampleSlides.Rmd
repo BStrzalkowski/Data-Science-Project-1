@@ -1,0 +1,83 @@
+---
+title: "To Beer or not to Beer"
+author: "Perfect Presenter"
+date: '2022-06-14'
+output:
+  ioslides_presentation: default
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r map graphics}
+
+library(BiocManager)
+library(usmap)
+library(stringr)
+library(ggplot2)
+library(readr)
+library(dplyr)
+library(tidyr)
+
+setwd("/Volumes/Safe/Documents/Tutoring/R-Programing/BernardS")
+Breweries <- read_csv("Breweries.csv")
+Beers <- read_csv("Beers.csv", col_types = cols(Beer_ID = col_integer(), 
+    Brewery_id = col_integer()), na = "NA")
+
+# rename columns
+rename(Beers, Brew_ID = Brewery_id,Beer=Name) -> Beers
+rename(Breweries, state = State,Brewery=Name) -> Breweries
+
+# group by state, count breweries in state, order by count and state.
+Q1 <- Breweries %>% group_by(state) %>% summarise(Density = n()) %>% arrange(desc(Density),state)
+```
+
+## R Markdown
+
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+
+
+```{r cars, echo=FALSE}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+
+## Basics
+1.	How many breweries are present in each state?
+2.	Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.  (RMD only, this does not need to be included in the presentation or the deck.)
+
+## Choropleth Map
+### Density of breweries by state  
+note: size of graphic controled  in Chunk header with the code for  
+- fig.width  
+- fig.height  
+- fig.align
+```{r fig.height = 4, fig.width = 4.5, fig.align = "right"}
+plot_usmap(regions ="state", data = Q1, size=.2, values = "Density") + 
+    scale_fill_continuous( low = "pink", high = "darkred", 
+                         name = "Breweries", label = scales::comma) + 
+  theme(legend.position = "right") +
+  labs(title = "Brewery Density by State") 
+#+   theme(panel.background = element_rect(color = "grey90", fill = "lightblue")) 
+```
+
+note: does not consider state population. 
+
